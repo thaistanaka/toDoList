@@ -3,10 +3,10 @@ package com.example.todolist.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
+import java.time.LocalDateTime
 
 @Entity(tableName = "to_do_item")
-data class ToDoItem (
+data class ToDoItem constructor(
     @PrimaryKey(autoGenerate = true)
     var itemId: Long = 0L,
     @ColumnInfo(name = "done")
@@ -16,5 +16,5 @@ data class ToDoItem (
     @ColumnInfo(name = "description")
     var description: String = "",
     @ColumnInfo(name = "createdDate")
-    var createdDate: Date = Calendar.getInstance().time
+    var createdDate: String = LocalDateTime.now().toString()
 )

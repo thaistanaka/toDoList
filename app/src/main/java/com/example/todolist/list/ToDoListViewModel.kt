@@ -1,4 +1,4 @@
-package com.example.todolist.ToDoList
+package com.example.todolist.list
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -10,24 +10,25 @@ import com.example.todolist.database.ToDoItemDao
 import com.example.todolist.database.ToDoItemDatabase
 import com.example.todolist.database.ToDoRepository
 import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-class ToDoListViewModel (toDoItemDao: ToDoItemDao, application: Application): AndroidViewModel(application) {
+class ToDoListViewModel (application: Application): AndroidViewModel(application) {
     private var viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val coroutineContext: CoroutineContext
+        get() = viewModelJob + Dispatchers.Main
+    private val scope = CoroutineScope(coroutineContext)
     private var itemSelected = MutableLiveData<ToDoItem?>()
     val toDoList: LiveData<List<ToDoItem>>
-        get() {
-            TODO()
-        }
     private val repository: ToDoRepository
 
     init {
+        val toDoItemDao = ToDoItemDatabase.getInstance(application, scope).toDoItemDao()
         repository = ToDoRepository(toDoItemDao)
-        repository.toDoList
+        toDoList = repository.toDoList
     }
 
-    fun insert(toDoItem: ToDoItem) = viewModelScope.launch{
-        repository.insert(toDoItem)
+    fun update(toDoItem: ToDoItem) = scope.launch(Dispatchers.IO) {
+        repository.update(toDoItem)
     }
 
     override fun onCleared() {

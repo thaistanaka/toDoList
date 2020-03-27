@@ -1,25 +1,34 @@
-package com.example.todolist.ToDoList
+package com.example.todolist.list
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.R
 import com.example.todolist.database.ToDoItem
 
+
 class ToDoListAdapter internal constructor(
-    context: Context?
+    context: Context?,
+    progressBar: ProgressBar,
+    viewModel: ToDoListViewModel
 ) : RecyclerView.Adapter<ToDoListAdapter.ToDoViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var toDoList = emptyList<ToDoItem>() // Cached copy of words
+    private var toDoList = emptyList<ToDoItem>()
+    private val progressBar = progressBar
+    private val context = context
+    private val viewModel = viewModel
 
     inner class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val toDoItemTitle: TextView = itemView.findViewById(R.id.title)
         val toDoItemDescription: TextView = itemView.findViewById(R.id.description)
+        val item: View = itemView.findViewById(R.id.itemView)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
@@ -30,7 +39,25 @@ class ToDoListAdapter internal constructor(
     override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
         val toDoItem = toDoList[position]
         holder.toDoItemTitle.text = toDoItem.title
-        holder.toDoItemDescription.text = toDoItem.description
+        if(toDoItem.description == ""){
+            holder.toDoItemDescription.text = "There is no description"
+        } else {
+            holder.toDoItemDescription.text = toDoItem.description
+        }
+
+        if(toDoItem.done == true){
+            holder.item.setBackgroundColor(Color.parseColor("#00aaff"))
+        } else {
+            holder.item.setBackgroundColor(Color.parseColor("#ffffff"))
+        }
+
+        progressBar.setVisibility(View.GONE);
+
+        holder.item.setOnClickListener {
+            toDoItem.done = true
+            holder.item.setBackgroundColor(Color.parseColor("#00aaff"))
+            viewModel.update(toDoItem)
+        }
     }
 
     internal fun setToDoList(toDoList: List<ToDoItem>) {

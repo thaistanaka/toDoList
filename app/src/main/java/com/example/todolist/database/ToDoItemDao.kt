@@ -14,6 +14,9 @@ interface ToDoItemDao {
     @Delete
     fun delete(toDoItem: ToDoItem)
 
+    @Query("DELETE FROM to_do_item")
+    fun deleteAll()
+
     @Query("SELECT * FROM to_do_item ORDER BY itemId DESC")
     fun getAll(): LiveData<List<ToDoItem>>
 }

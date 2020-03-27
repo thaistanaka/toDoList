@@ -1,6 +1,7 @@
 package com.example.todolist.database
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -9,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [ToDoItem::class], version=1, exportSchema = false)
+@Database(entities = arrayOf(ToDoItem::class), version=1, exportSchema = false)
 abstract class ToDoItemDatabase: RoomDatabase() {
     abstract fun toDoItemDao(): ToDoItemDao
 
@@ -17,36 +18,27 @@ abstract class ToDoItemDatabase: RoomDatabase() {
         @Volatile
         private var INSTANCE: ToDoItemDatabase? = null
 
-        fun getInstance(context: Context): ToDoItemDatabase{
-            synchronized(this) {
-                var instance = INSTANCE
-
-                if (instance == null) {
-                    instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        ToDoItemDatabase::class.java,
-                        "todo_history_database"
-                    )
-                        .fallbackToDestructiveMigration()
-                        .build()
-                    INSTANCE = instance
-                }
-                return instance
-            }
-
+        fun getInstance(context: Context, scope: CoroutineScope): ToDoItemDatabase{
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    ToDoItemDatabase::class.java,
+                    "todo_database"
+                )
+                    .fallbackToDestructiveMigration()
+                    .addCallback(ToDoItemDatabaseCallback(scope))
+                    .build()
+                INSTANCE = instance
+                instance
+        }
         }
 
         private class ToDoItemDatabaseCallback(
             private val scope: CoroutineScope
         ) : RoomDatabase.Callback() {
-            /**
-             * Override the onOpen method to populate the database.
-             * For this sample, we clear the database every time it is created or opened.
-             */
+
             override fun onOpen(db: SupportSQLiteDatabase) {
                 super.onOpen(db)
-                // If you want to keep the data through app restarts,
-                // comment out the following line.
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
                         populateDatabase(database.toDoItemDao())
@@ -55,16 +47,8 @@ abstract class ToDoItemDatabase: RoomDatabase() {
             }
         }
 
-        /**
-         * Populate the database in a new coroutine.
-         * If you want to start with more words, just add them.
-         */
         fun populateDatabase(toDoItemDao: ToDoItemDao) {
-
-            var toDoItem = ToDoItem(title = "Hello")
-            toDoItemDao.insert(toDoItem)
-            toDoItem = ToDoItem(title="World!")
-            toDoItemDao.insert(toDoItem)
+            toDoItemDao.deleteAll()
         }
     }
-}
+    }

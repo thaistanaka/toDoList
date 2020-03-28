@@ -18,4 +18,10 @@ class ToDoRepository(private val toDoItemDao: ToDoItemDao) {
     suspend fun update(toDoItem: ToDoItem) {
         toDoItemDao.update(toDoItem)
     }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun delete(toDoItem: ToDoItem) {
+        toDoItemDao.delete(toDoItem)
+    }
 }

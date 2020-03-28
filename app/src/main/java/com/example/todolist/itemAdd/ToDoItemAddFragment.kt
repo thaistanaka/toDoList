@@ -32,8 +32,6 @@ class ToDoItemAddFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        //return inflater.inflate(R.layout.fragment_to_do_item, container, false)
 
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_to_do_item, container, false)
@@ -43,9 +41,7 @@ class ToDoItemAddFragment : Fragment() {
 
         val application = requireNotNull(this.activity).application
 
-        val viewModelFactory = ToDoItemAddViewModelFactory(
-            title.text.toString(), description.text.toString(), application
-        )
+        val viewModelFactory = ToDoItemAddViewModelFactory(application)
 
         viewModel =
             ViewModelProvider(this, viewModelFactory).get(ToDoItemAddViewModel::class.java)

@@ -14,7 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class ToDoItemAddViewModel (title: String, description: String, application: Application): AndroidViewModel(application) {
+class ToDoItemAddViewModel (application: Application): AndroidViewModel(application) {
     private var viewModelJob = Job()
     private val coroutineContext: CoroutineContext
         get() = viewModelJob + Dispatchers.Main

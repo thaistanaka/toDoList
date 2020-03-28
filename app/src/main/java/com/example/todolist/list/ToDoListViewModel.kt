@@ -31,6 +31,10 @@ class ToDoListViewModel (application: Application): AndroidViewModel(application
         repository.update(toDoItem)
     }
 
+    fun delete(toDoItem: ToDoItem) = scope.launch(Dispatchers.IO) {
+        repository.delete(toDoItem)
+    }
+
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()

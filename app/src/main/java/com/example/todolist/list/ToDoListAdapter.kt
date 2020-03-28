@@ -2,11 +2,10 @@ package com.example.todolist.list
 
 import android.content.Context
 import android.graphics.Color
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todolist.R
 import com.example.todolist.database.ToDoItem
@@ -28,7 +27,6 @@ class ToDoListAdapter internal constructor(
         val toDoItemTitle: TextView = itemView.findViewById(R.id.title)
         val toDoItemDescription: TextView = itemView.findViewById(R.id.description)
         val item: View = itemView.findViewById(R.id.itemView)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
@@ -57,6 +55,26 @@ class ToDoListAdapter internal constructor(
             toDoItem.done = true
             holder.item.setBackgroundColor(Color.parseColor("#00aaff"))
             viewModel.update(toDoItem)
+        }
+
+        holder.item.setOnLongClickListener {
+            var menu = context?.let { context -> PopupMenu(context, it) }
+            if (menu != null) {
+                menu.inflate(R.menu.menu)
+                menu.show()
+                menu.setOnMenuItemClickListener {
+                    when(it.itemId) {
+                        R.id.delete -> {
+                            viewModel.delete(toDoItem)
+                            true
+                        }
+                        else -> {
+                            true
+                        }
+                    }
+                }
+            }
+            true
         }
     }
 

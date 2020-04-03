@@ -19,14 +19,12 @@ import kotlinx.android.synthetic.main.fragment_to_do_list.*
 
 class ToDoListFragment : Fragment() {
 
-    private lateinit var binding: FragmentToDoListBinding
+    private var binding: FragmentToDoListBinding? = null
 
-    private lateinit var viewModel: ToDoListViewModel
+    private var viewModel: ToDoListViewModel? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_to_do_list, container, false)
 
@@ -37,36 +35,36 @@ class ToDoListFragment : Fragment() {
         viewModel =
             ViewModelProvider(this, viewModelFactory).get(ToDoListViewModel::class.java)
 
-        binding.setLifecycleOwner(this)
+        binding?.lifecycleOwner = this
 
-        val recyclerView = binding.recyclerView
-        val adapter = ToDoListAdapter(context, binding.progressbar, viewModel)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        val recyclerView = binding?.recyclerView
+        val adapter = ToDoListAdapter(context, binding?.progressbar!!, viewModel!!)
+        recyclerView?.adapter = adapter
+        recyclerView?.layoutManager = LinearLayoutManager(context)
         val itemDecoration: ItemDecoration =
             DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-        recyclerView.addItemDecoration(itemDecoration)
+        recyclerView?.addItemDecoration(itemDecoration)
 
-        viewModel.toDoList.observe(viewLifecycleOwner, Observer { toDoList ->
+        viewModel?.toDoList?.observe(viewLifecycleOwner, Observer { toDoList ->
             toDoList?.let { adapter.setToDoList(it)
-                if(adapter.getItemCount() == 0){
-                    progressbar.setVisibility(View.GONE)
-                    recyclerView.setVisibility(View.GONE)
-                    binding.empty.setVisibility(View.VISIBLE)
+                if(adapter.itemCount == 0){
+                    progressbar.visibility = View.GONE
+                    recyclerView?.visibility = View.GONE
+                    binding?.empty?.visibility = View.VISIBLE
                 } else {
-                    recyclerView.setVisibility(View.VISIBLE)
-                    binding.empty.setVisibility(View.GONE)
+                    recyclerView?.visibility = View.VISIBLE
+                    binding?.empty?.visibility = View.GONE
                 }}
         })
 
-        binding.toDoListViewModel = viewModel
+        binding?.toDoListViewModel = viewModel
 
-        binding.fab.setOnClickListener {
+        binding?.fab?.setOnClickListener {
                 view: View ->
             view.findNavController().navigate(R.id.action_toDoListFragment_to_toDoItemFragment)
         }
 
-        return binding.root
+        return binding?.root
     }
 
 }
